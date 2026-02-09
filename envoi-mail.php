@@ -1,35 +1,28 @@
 <?php
 /**
  * Envoi du formulaire de devis vers philippe.clemente@orange.fr
- * À utiliser quand le site est hébergé sur un serveur PHP (Orange, OVH, etc.).
+ * Utilisé uniquement si le site est hébergé sur un serveur PHP.
+ * Par défaut le formulaire utilise mailto (aucune erreur sur hébergement statique).
  */
-header('Content-Type: text/html; charset=utf-8');
-
 $destinataire = 'philippe.clemente@orange.fr';
-$sujet = 'Demande de devis Formation SST - ' . (isset($_POST['nom']) ? strip_tags($_POST['nom']) : 'Site');
 
-$nom    = isset($_POST['nom']) ? strip_tags(trim($_POST['nom'])) : '';
-$email  = isset($_POST['email']) ? filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL) : '';
-$message = isset($_POST['message']) ? strip_tags(trim($_POST['message'])) : '';
-
-$corps = "Nom : $nom\n";
-$corps .= "Email : $email\n\n";
-$corps .= "Message :\n$message\n";
-
-$entetes = "From: $destinataire\r\n";
-$entetes .= "Reply-To: $email\r\n";
-$entetes .= "X-Mailer: PHP/" . phpversion() . "\r\n";
-$entetes .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-$envoye = false;
-if ($nom && $email && $message) {
-    $envoye = @mail($destinataire, $sujet, $corps, $entetes);
-}
-
-if ($envoye) {
-    header('Location: index.html?envoi=ok#contact');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: index.html#contact', true, 302);
     exit;
 }
 
-header('Location: index.html?envoi=erreur#contact');
+$nom    = isset($_POST['nom']) ? trim(strip_tags((string) $_POST['nom'])) : '';
+$email  = isset($_POST['email']) ? trim(filter_var((string) $_POST['email'], FILTER_SANITIZE_EMAIL)) : '';
+$message = isset($_POST['message']) ? trim(strip_tags((string) $_POST['message'])) : '';
+
+$envoye = false;
+if ($nom !== '' && $email !== '' && $message !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $sujet = 'Demande de devis Formation SST - ' . $nom;
+    $corps = "Nom : $nom\nEmail : $email\n\nMessage :\n$message\n";
+    $entetes = "From: $destinataire\r\nReply-To: $email\r\nContent-Type: text/plain; charset=UTF-8\r\n";
+    $envoye = @mail($destinataire, $sujet, $corps, $entetes);
+}
+
+header('Content-Type: text/html; charset=utf-8');
+header('Location: index.html?envoi=' . ($envoye ? 'ok' : 'erreur') . '#contact', true, 302);
 exit;
