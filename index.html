@@ -560,7 +560,7 @@
 
   <section id="accueil" class="hero" aria-label="Accueil">
     <div class="hero-logo">
-      <img src="image/image.png" alt="Formation SST – Secours et prévention" width="220" height="120" loading="eager" decoding="async">
+      <img src="image/logo.png" alt="Formation SST – Secours et prévention" width="220" height="120" loading="eager" decoding="async">
     </div>
     <div class="hero-inner">
       <p class="badge">Sauveteur Secouriste du Travail</p>
@@ -824,7 +824,7 @@
           <p style="margin-top: 1rem;"><a href="#formations" class="cta-link">Voir les formations →</a></p>
           <p><a href="#contact" class="btn-cta btn-cta-primary" style="display: inline-block; margin-top: 0.5rem;">Réserver une formation</a></p>
         </div>
-        <img src="image/image.jpeg" alt="Philippe Clemente, formateur SST" class="photo" width="200" height="280" loading="lazy">
+        <img src="image/formateur.jpg" alt="Philippe Clemente, formateur SST" class="photo" width="200" height="280" loading="lazy">
       </div>
     </div>
   </section>
@@ -907,7 +907,10 @@
         </div>
         <div class="contact-form-box">
           <h3>Demander un devis</h3>
-          <form id="form-devis" action="mailto:philippe.clemente@orange.fr" method="get" enctype="application/x-www-form-urlencoded">
+          <p id="msg-envoi-ok" class="msg-envoi" style="display:none; color: var(--green-prevention); font-weight: 600;">Votre demande a bien été envoyée. Réponse sous 24 h.</p>
+          <p id="msg-envoi-erreur" class="msg-envoi" style="display:none; color: var(--red-secours); font-weight: 600;">L’envoi a échoué. Vous pouvez nous écrire à <a href="mailto:philippe.clemente@orange.fr">philippe.clemente@orange.fr</a>.</p>
+          <!-- Envoi vers la boîte mail du client : envoi-mail.php (hébergement PHP). Si hébergement statique, remplacer action par votre URL Formspree (formspree.io). -->
+          <form id="form-devis" action="envoi-mail.php" method="post">
             <label>
               <span>Nom</span>
               <input type="text" name="nom" id="devis-nom" required placeholder="Votre nom" />
@@ -918,21 +921,22 @@
             </label>
             <label>
               <span>Message</span>
-              <textarea name="body" id="devis-message" required rows="4" placeholder="Formation souhaitée, nombre de personnes, lieu..."></textarea>
+              <textarea name="message" id="devis-message" required rows="4" placeholder="Formation souhaitée, nombre de personnes, lieu..."></textarea>
             </label>
             <button type="submit">Envoyer ma demande</button>
           </form>
           <script>
-            document.getElementById('form-devis').addEventListener('submit', function(e) {
-              e.preventDefault();
-              var nom = encodeURIComponent(document.getElementById('devis-nom').value);
-              var email = encodeURIComponent(document.getElementById('devis-email').value);
-              var message = encodeURIComponent(document.getElementById('devis-message').value);
-              var subject = encodeURIComponent('Demande de devis Formation SST - ' + document.getElementById('devis-nom').value);
-              var body = 'Nom : ' + document.getElementById('devis-nom').value + '\nEmail : ' + document.getElementById('devis-email').value + '\n\nMessage :\n' + document.getElementById('devis-message').value;
-              var mailto = 'mailto:philippe.clemente@orange.fr?subject=' + subject + '&body=' + encodeURIComponent(body);
-              window.location.href = mailto;
-            });
+            (function() {
+              var params = new URLSearchParams(window.location.search);
+              if (params.get('envoi') === 'ok') {
+                var el = document.getElementById('msg-envoi-ok');
+                if (el) el.style.display = 'block';
+              }
+              if (params.get('envoi') === 'erreur') {
+                var el = document.getElementById('msg-envoi-erreur');
+                if (el) el.style.display = 'block';
+              }
+            })();
           </script>
         </div>
       </div>
@@ -942,7 +946,7 @@
   <footer class="footer" role="contentinfo">
     <div class="footer-inner">
       <div class="footer-logo-wrap">
-        <img src="image/image.png" alt="Formation SST" class="footer-logo" width="160" height="56" loading="lazy" decoding="async">
+        <img src="image/logo.png" alt="Formation SST" class="footer-logo" width="160" height="56" loading="lazy" decoding="async">
       </div>
       <div>
         <p>© 2025 Philippe Clemente – Formation SST. Formateur certifié INRS.</p>
